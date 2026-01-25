@@ -1,0 +1,13 @@
+package com.brightfuture.BrightFuture;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class BrightFutureApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(BrightFutureApplication.class, args);
+	}
+
+}

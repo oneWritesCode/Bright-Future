@@ -1,0 +1,81 @@
+version: '3'
+
+services:
+  dbservice:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD} 
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 --password=$$DB_PASSWORD
+      timeout: 20s
+      retries: 10
+    ports:
+      - 3306:3306
+    volumes:
+      - db:/var/lib/mysql
+    networks:
+      - brightapp
+  
+  frontend:
+    container_name: frontend
+    build: ./frontend
+    depends_on:
+      - appservice
+    ports:
+      - 5173:5173
+    stdin_open: true
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+      VITE_RAZORPAY_KEY: ${VITE_RAZORPAY_KEY}
+    command: npm run dev
+    networks:
+      - brightapp
+    volumes:
+      - './:/app'
+      - '/app/node_modules'
+
+  appservice:
+    build:
+      context: ./backend/BrightFuture
+      dockerfile: Dockerfile
+    env_file:
+      - ./backend/BrightFuture/.env
+    depends_on:
+      dbservice:
+        condition: service_healthy
+      
+    environment:
+      SPRING_DATASOURCE_URL: ${DB_URL}
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+      LOGGING_LEVEL_ORG_HIBERNATE_SQL: DEBUG
+      LOGGING_LEVEL_ORG_HIBERNATE_TYPE_DESCRIPTOR_SQL_BASICBINDER: TRACE
+      SPRING_JPA_GENERATE_DDL: "true"
+  
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: 587
+      SPRING_MAIL_USERNAME: ${MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${MAIL_PASSWORD}
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: true
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: true
+      
+      RAZORPAY_API_KEY: ${RAZORPAY_KEY_ID} 
+      RAZORPAY_API_SECRET: ${RAZORPAY_KEY_SECRET} 
+    
+    volumes:
+      - app_data:/path/to/app_data
+    ports:
+      - 8080:8080
+    networks:
+      - brightapp
+  
+networks:
+  brightapp:
+    driver: bridge
+  
+volumes:
+  db:
+  app_data:
+   

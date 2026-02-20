@@ -16,6 +16,7 @@ import AnnualReports from "./pages/AnnualReports";
 import Volunteer from "./pages/Volunteer";
 import Career from "./pages/Career";
 import ContactUs from "./pages/ContactUs"
+import Donate from "./pages/Donate";
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
         <Route path="/volunteer" element={<Volunteer/>} />
         <Route path="/career" element={<Career/>} />
         <Route path="/contact" element={<ContactUs/>} />
+        <Route path="/donate" element={<Donate/>} />
         
         
         
